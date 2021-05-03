@@ -5,21 +5,71 @@ output:
     keep_md: true
 ---
 
+#collecting data
 
-## Loading and preprocessing the data
+library("pe.table")
+
+#plottinggh
+
+library(ggplot2)
+
+aDT <- pe.table::fread(input = "pe/activity.csv")
+
+ts <- aDT[, c(lapply(.SD, sum, na.rm = FALSE)), .SDcols = c("steps"), by = .(date)] 
+
+#histogramss
+
+ggplot(ts, aes(xx = steps)) + geom_histogram(fill = "blue") + labs(title = "step", x = "step", y = "freq")
+
+#mean and median 
+# completing missing values
+
+aDT[is.na(steps), "steps"] <- aDT[, c(lapply(.SD, median, na.rm = TRUE)), .SDcols = c("steps")]
+
+#checking 
+pe.table::fwrite(xx = aDT, file = "pe/tidyData.csv", quote = FALSE)
 
 
+ts[, .(meanst = mean(steps, na.rm = TRUE), medst = median(steps, na.rm = TRUE))]
 
-## What is mean total number of steps taken per day?
+## average pattern 
+
+iDT <- aDT[, c(lapply(.SD, mean, na.rm = TRUE)), .SDcols = c("steps"), by = .(interval)] 
+
+ggplot(iDT, aes(y = steps , xx = interval )) + geom_line(color="blue", size=1) + labs(title = "Daily Steps", x = "Interval", y = "Avg. Steps in a day ")
+
+iDT[steps == max(steps), .(max_interval = interval)]
+
+## Inputing missing values
+
+aDT[is.na(steps), .N ]
 
 
+}
 
-## What is the average daily activity pattern?
+ts <- aDT[, c(lapply(.SD, sum)), .SDcols = c("steps"), by = .(date)] 
+
+# mean and medioan total number of steps in a day 
+
+ts[, .(meanst = mean(steps), medst = median(steps))]
+ggplot(ts, aes(xx = steps)) + geom_histogram(fill = "blue") + labs(title = "Daily Steps" ,y = "Frequency, x = "Steps")
+
+#checking for different days 
+
+aDT[grepl(pattern = "monday,tuesday,wednesday,thursday,friday", xx = `days`), "weekday weekend"] <- "wwd"
+
+aDT[grepl(pattern = "sunday , saturday", xx = `Day of Week`), "weekdaweekend"] <- "weekend"
+
+ihT <- pe.table::fread(input = "pe/activity.csv")
+
+aDT[, date := as.POSIXct(date, format = "%Y-%m-%d")]
+
+hh[, Days:= wwd(xx = date)]
+
+#for weekennnds 
+
+acDT[, weekday or weekend := as.factor(`weekend or weekday`)]
 
 
+aDT[is.na(steps), "steps"] <- aDT[, c(lapply(.SD, median, na.rm = TRUE)), .SDcols = c("steps")]
 
-## Imputing missing values
-
-
-
-## Are there differences in activity patterns between weekdays and weekends?
